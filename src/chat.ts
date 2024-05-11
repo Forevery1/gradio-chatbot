@@ -99,9 +99,7 @@ export class GradioChatBot {
     }
     assert(this.options.endpoint || this.options.url, 'endpoint and url must specify one of them');
     if (!isNaN(this.options.url as any)) {
-      const index = parseInt(this.options.url!, 10);
-      assert(index < spaces.length, `The model index range is [0 - ${spaces.length - 1}].`)
-      let config: string | GradioAutoOptions = spaces[index];
+      let config: string | GradioAutoOptions = spaces[this.options.url!];
       if (typeof config === 'string') {
         config = { url: config };
       }
@@ -122,10 +120,10 @@ export class GradioChatBot {
 
   private parseInputs = (fnIndex: number, config: any, skip_text = false) => {
     const { components, dependencies } = config;
-  
+
     const submitFn = dependencies[fnIndex];
     const inputs = submitFn?.inputs.map(id => this.instance_map[id].props.value);
-  
+
     debug('fnIndex', fnIndex);
     let textInputIndex = skip_text ? 0 : submitFn?.inputs.indexOf(submitFn?.targets?.[0]);
     if (textInputIndex < 0) {
@@ -255,11 +253,11 @@ export class GradioChatBot {
               })
             );
           }
-      
+
           if (current_status === "pending" || current_status === "generating") {
             return;
           }
-      
+
           let payload = {
             fn_index: dep_index,
             data: data || dep.inputs.map((id) => instance_map[id].props.value),
@@ -281,14 +279,14 @@ export class GradioChatBot {
                       trigger_api_call(i);
                     }
                   });
-      
+
                   submission.destroy();
                   if (end) {
                     const message = this.history?.at(-1)?.at(-1);
                     resolve(this.html2Markdown(message));
                   }
                 }
-      
+
                 if (status.stage === "error") {
                   if (status.message) {
                     const _message = status.message.replace(
@@ -319,7 +317,7 @@ export class GradioChatBot {
                   submission.destroy();
                 }
               });
-      
+
             submit_map.set(dep_index, submission);
           }
           if (dep.frontend_fn) {
